@@ -200,28 +200,45 @@ console.log(ride.speed)
 // OBJECT ORIENTED PROGRAMMING (OOP)
 // OOP is a paradigms or style of programming. 
 class Account {
-    username?: string
+    nickname?: string   // ? means optional property
 
-    constructor(
-        public readonly id: number, 
-        public owner: string, 
-        private _balance: number ){
+    // readonly id: number;
+    // owner: string;
+    // private _balance: number
+
+    constructor(public readonly id: number, public owner: string, private _balance: number ){
+            // this.id: id;
+            // this.owner: owner;
+            // this._balance: balance
     }
 
     deposit(amount: number) {
-        if (amount <= 0)
-            throw new Error ('Invalid amount');
-       this._balance += amount;
+        if (amount <= 0) throw new Error ('Amount is less than zero');
+        this._balance += amount;
     }
 
-    // getBalance(): number {
-    //     return this._balance
-    // };
+    getBalance(): number {
+        return this._balance
+    };
+
+    calculateTax(amount: number): number {
+        let taxAmount: number;
+        if (amount <= 12500) {
+            taxAmount = 0
+        } else if (amount > 12500 && amount < 50000) {
+            taxAmount = (amount - 12500) * 0.2
+        } else if (amount >= 50000 && amount < 10000) {
+            taxAmount = (amount - 12500) * 0.4
+        } else {
+            taxAmount = (amount - 12500) * 0.45
+        }
+        return taxAmount
+    }
 
     // Getter
-    get balance(): number {
-        return this._balance
-    }
+    // get balance(): number {
+    //     return this._balance
+    // }
 
     // Setter
     // set balance (value: number) {
@@ -233,18 +250,19 @@ class Account {
 let account = new Account(1, 'Roland', 0);
 account.deposit(500);
 // account.balance = 20000
-account.username = 'RollyJS'
+account.nickname = 'RollyJS'
 console.log(account)
-// console.log(account.getBalance())
-console.log(account.balance)  // Getter approach
-console.log(account instanceof Account)
+console.log(account.getBalance())
+// console.log(account.balance)  // Getter approach
+console.log(account.calculateTax(15500))
+console.log(account instanceof Account);
 
 
 // INDEX SIGNATURES
 class SeatArrangement {
     // A1, A2, ...
     // 'Roland', 'Mosh', ...
-    // Index signatures
+    // Index signature property 
     [seatNumber: string]: string;
 };
 
@@ -252,3 +270,73 @@ let seats = new SeatArrangement();
 seats.A1 = 'Roland';
 seats['A2'] = 'Mosh';
 console.log(seats)
+
+
+// STATIC MEMBER/PROPERTIES
+// A static property is a property thats belong to the class and not the object. 
+// You will only have 1 instance of the static property in the memory
+class Ride {
+    private static _activeRides: number = 0;
+
+    start() {Ride._activeRides++};
+    stop() {Ride._activeRides--};
+
+    static get activeRides() {
+        return Ride._activeRides
+    }
+};
+
+let ride1 = new Ride()
+ride1.start();
+
+let ride2 = new Ride()
+ride2.start();
+
+let ride3 = new Ride()
+ride3.start();
+
+let ride4 = new Ride()
+ride4.start();
+
+// console.log(Ride.activeRides)
+// At the console, I got result for each of ride 1 and ride 2 whereas i should i have a single result for rides.
+// Explanation: ride 1 and ride 2 are objects and each object is in separate space in memory
+// So, each ride is independently tracking the active rides which is the cause of the bug issues.
+// To resolve this, what we need is a single pr global place where we can track the active rides. This is where STATIC PROPERTY comes in.
+
+
+// INHERITANCE
+// This is a mechanism in OOP that allows us to resue our code. 
+// Children inherit properties from their parent
+class Person {
+    constructor (public firstName: string, public lastName: string) {
+    }
+
+    get fullName() {
+        return this.firstName + ' ' + this.lastName
+    }
+
+    walk () {
+        console.log('Walking')
+    }
+};
+
+class Student extends Person {
+    constructor (public studentId: number, firstName: string, lastName: string) {
+        super(firstName, lastName)
+    }
+
+    takeTest(){
+        console.log(`${this.fullName} with sid ${this.studentId} is taking a test`)
+    }
+}
+
+class Teacher extends Person {
+    override get fullName() {
+        return 'Professor ' + super.fullName
+    }
+}
+
+let teacher = new Teacher('Adams', 'Fred')
+console.log(teacher.fullName)
+
